@@ -21,6 +21,7 @@
   <properties>
     <surefire.forkCount>1</surefire.forkCount>
     <alphanetworkCompilerEnabled>false</alphanetworkCompilerEnabled>
+    <version.io.quarkus>0.18.0</version.io.quarkus>
   </properties>
 
   <repositories>

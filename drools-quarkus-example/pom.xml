@@ -13,7 +13,6 @@
 
   <properties>
     <generateProcessModel>NO</generateProcessModel>
-    <version.io.quarkus>0.17.0</version.io.quarkus>
   </properties>
 
   <dependencyManagement>
