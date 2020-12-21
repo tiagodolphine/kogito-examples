@@ -18,24 +18,14 @@ package org.kie.kogito;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @ApplicationScoped
-public class PaymentService {
+public class PaymentService extends BaseService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentService.class);
-
-    @Inject
-    MockService mockService;
-
-    public Response createPayment(String tripId, String failService) {
-        LOGGER.info("Create Payment for trip {}", tripId);
-        return mockService.execute(failService, this.getClass());
+    public PaymentService() {
     }
 
-    public Response cancelPayment(String id) {
-        LOGGER.info("Cancel Payment for payment {}", id);
-        return new Response(Response.Type.SUCCESS, id);
+    @Inject
+    public PaymentService(MockService mockService) {
+        super(mockService, "Payment");
     }
 }

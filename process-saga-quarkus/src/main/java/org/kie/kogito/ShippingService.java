@@ -16,22 +16,16 @@
 package org.kie.kogito;
 
 import javax.enterprise.context.ApplicationScoped;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.inject.Inject;
 
 @ApplicationScoped
-public class TripService {
+public class ShippingService extends BaseService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TripService.class);
-
-    public Response success(String tripId) {
-        LOGGER.info("Trip Success for trip {}", tripId);
-        return Response.success(tripId);
+    public ShippingService() {
     }
 
-    public Response failure(String tripId) {
-        LOGGER.info("Trip Failed for trip {}", tripId);
-        return Response.error(tripId);
+    @Inject
+    public ShippingService(MockService mockService) {
+        super(mockService, "Shipping");
     }
 }

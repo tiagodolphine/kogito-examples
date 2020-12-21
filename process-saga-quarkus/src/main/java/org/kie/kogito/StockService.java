@@ -22,20 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class HotelService {
+public class StockService extends BaseService{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HotelService.class);
-
-    @Inject
-    MockService mockService;
-
-    public Response bookHotel(String tripId, String failService) {
-        LOGGER.info("Book Hotel for trip {}", tripId);
-        return mockService.execute(failService, this.getClass());
+    public StockService() {
     }
 
-    public Response cancelHotel(String id) {
-        LOGGER.info("Cancel Hotel for booking {}", id);
-        return new Response(Response.Type.SUCCESS, id);
+    @Inject
+    public StockService(MockService mockService) {
+        super(mockService, "Stock");
     }
 }

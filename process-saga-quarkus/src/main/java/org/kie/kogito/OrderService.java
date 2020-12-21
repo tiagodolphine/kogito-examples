@@ -16,26 +16,22 @@
 package org.kie.kogito;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class FlightService {
+public class OrderService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlightService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderService.class);
 
-    @Inject
-    MockService mockService;
-
-    public Response bookFlight(String tripId, String failService) {
-        LOGGER.info("Book Flight for trip {}", tripId);
-        return mockService.execute(failService, this.getClass());
+    public Response success(String id) {
+        LOGGER.info("Success Order {}", id);
+        return Response.success(id);
     }
 
-    public Response cancelFlight(String id) {
-        LOGGER.info("Cancel Flight for booking {}", id);
-        return new Response(Response.Type.SUCCESS, id);
+    public Response failure(String id) {
+        LOGGER.warn("Failed Order {}", id);
+        return Response.error(id);
     }
 }
