@@ -1,5 +1,5 @@
 /**
- *  Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ *  Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,44 +28,44 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 @QuarkusTest
 public class ProcessSagaIT {
 
-    public static final String TRIP_ID = "03e6cf79-3301-434b-b5e1-d6899b5639aa";
+    public static final String ORDER_ID = "03e6cf79-3301-434b-b5e1-d6899b5639aa";
 
     @Test
-    public void testTripSuccess() {
+    public void testOrderSuccess() {
         String payload = "{\n" +
-                "    \"tripId\": \"" + TRIP_ID + "\"\n" +
+                "    \"orderId\": \"" + ORDER_ID + "\"\n" +
                 "}";
-        ExtractableResponse<Response> response = createTrip(payload);
+        ExtractableResponse<Response> response = createOrder(payload);
         response.path("id");
+        assertThat(response.<String>path("stockResponse.type")).isEqualTo("SUCCESS");
         assertThat(response.<String>path("paymentResponse.type")).isEqualTo("SUCCESS");
-        assertThat(response.<String>path("hotelResponse.type")).isEqualTo("SUCCESS");
-        assertThat(response.<String>path("flightResponse.type")).isEqualTo("SUCCESS");
-        assertThat(response.<String>path("tripResponse.type")).isEqualTo("SUCCESS");
-        assertThat(response.<String>path("tripResponse.resourceId")).isEqualTo(TRIP_ID);
+        assertThat(response.<String>path("shippingResponse.type")).isEqualTo("SUCCESS");
+        assertThat(response.<String>path("orderResponse.type")).isEqualTo("SUCCESS");
+        assertThat(response.<String>path("orderResponse.resourceId")).isEqualTo(ORDER_ID);
     }
 
     @Test
-    public void testTripFailure() {
+    public void testOrderFailure() {
         String payload = "{\n" +
-                "    \"tripId\": \"" + TRIP_ID + "\",\n" +
-                "    \"failService\" : \"PaymentService\"\n" +
+                "    \"orderId\": \"" + ORDER_ID + "\",\n" +
+                "    \"failService\" : \"ShippingService\"\n" +
                 "}";
-        ExtractableResponse<Response> response = createTrip(payload);
+        ExtractableResponse<Response> response = createOrder(payload);
         response.path("id");
-        assertThat(response.<String>path("hotelResponse.type")).isEqualTo("SUCCESS");
-        assertThat(response.<String>path("flightResponse.type")).isEqualTo("SUCCESS");
-        assertThat(response.<String>path("paymentResponse.type")).isEqualTo("ERROR");
-        assertThat(response.<String>path("tripResponse.type")).isEqualTo("ERROR");
-        assertThat(response.<String>path("tripResponse.resourceId")).isEqualTo(TRIP_ID);
+        assertThat(response.<String>path("stockResponse.type")).isEqualTo("SUCCESS");
+        assertThat(response.<String>path("paymentResponse.type")).isEqualTo("SUCCESS");
+        assertThat(response.<String>path("shippingResponse.type")).isEqualTo("ERROR");
+        assertThat(response.<String>path("orderResponse.type")).isEqualTo("ERROR");
+        assertThat(response.<String>path("orderResponse.resourceId")).isEqualTo(ORDER_ID);
     }
 
-    private ExtractableResponse<Response> createTrip(String payload) {
+    private ExtractableResponse<Response> createOrder(String payload) {
         ExtractableResponse<Response> response = given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .body(payload)
                 .when()
-                .post("/trip")
+                .post("/orders")
                 .then()
                 .statusCode(201)
                 .header("Location", notNullValue())
