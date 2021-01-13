@@ -2,11 +2,13 @@
 
 ## Description
 
-Service to demonstrate how to implement Saga pattern based on BPMN process with Kogito. The used example is based on a
- Trip reservation process with a sequence of steps that could represent calls to external services/microservices.
- All of each steps `book hotel`, `book flight` and `create payment` should be executed to confirm a Trip, if any of the
+Service to demonstrate how to implement Saga pattern based on BPMN process with Kogito. The proposed example is based
+ on an Order Fulfillment process which consists in a sequence of steps, that could represent calls to external
+  services, microservices, serverless functions, etc.
+  
+ All steps `stock`, `payment` and `shipping` should be executed to confirm an Order, if any of the
   steps fail, then a compensation for each completed step should be executed to undo the operation or to keep the
-   process on a consistent state. For instance, the book hotel step, should cancel the hotel booking. The
+   process on a consistent state. For instance, reserve stock step, should cancel the stock reservation. The
     compensations for the steps are represented in the process using a boundary `Intermediate Catching Compensation
 Event` attached to the respective step to be compensated.          
 
@@ -22,16 +24,16 @@ The steps and compensations actions in the process example are implemented as se
  the `src` of the project, and for this example they are just mocking responses, but in a real use case they
   could be executing calls to external services through REST, or any other mechanism depending on the architecture. 
  
- The start point of the trip process is to submit a request to create a new trip with a given `tripId`, this could be
-  any  other payload that represents a `Trip`, but for the sake of simplicity, in this example it will be
-   based on the `id`.
+ The start point of Saga process is to submit a request to create a new Order with a given `orderId`, this could be
+  any other payload that represents an `Order`, but for the sake of simplicity, in this example it will be
+   based on the `id` that could be used as a correlation to client starting the Saga.
   The output of each step, is represented by a `Response` that contains a type, indicating <b>success</b> or <b>error
   </b> and the id of the resource that was invoked in the service, but this could be any kind of response depending on
    the requirement of each service.
 
-## Trip Saga process
+## Order Saga process
 
-This is the BPMN process that represents the Trip Saga, and it is the one being used in the project to be built using
+This is the BPMN process that represents the Order Saga, and it is the one being used in the project to be built using
  kogito.
 
 <img src="docs/images/trip-saga.bpmn2.png" width="80%"/>
@@ -91,17 +93,17 @@ When running in either Quarkus Development or Native mode, we also leverage the 
 
 Once the service is up and running, you can use the following examples to interact with the service. Note that rather than using the curl commands below, you can also use the [Swagger UI](http://localhost:8080/swagger-ui/) to send requests.
 
-### Creating a new trip
+### Starting the Order Saga
 
-#### POST /trip
+#### POST /orders
 
-Allows to create a new trip with the given data:
+Allows to start a new Order Saga with the given data:
 
 Given data:
 
 ```json
 {
-    "tripId" : "03e6cf79-3301-434b-b5e1-d6899b5639aa"
+    "orderId" : "03e6cf79-3301-434b-b5e1-d6899b5639aa"
     
 }
 ```
@@ -109,10 +111,10 @@ Given data:
 Curl command (using the JSON object above):
 
 ```sh
-curl -H "Content-Type: application/json" -X POST http://localhost:8080/trip -d '{"tripId" : "03e6cf79-3301-434b-b5e1-d6899b5639aa"}'
+curl -H "Content-Type: application/json" -X POST http://localhost:8080/orders -d '{"orderId" : "03e6cf79-3301-434b-b5e1-d6899b5639aa"}'
 ```
-The response for the trip reservation is returned with the attributes representing the response of each step, either
- success or failure. The `tripResponse` attribute indicates if the trip can be confirmed in case of success or
+The response for the request is returned with attributes representing the response of each step, either
+ success or failure. The `orderResponse` attribute indicates if the order can be confirmed in case of success or
   canceled in case of error.
 
 Response example:
@@ -133,7 +135,7 @@ Response example:
             "type": "SUCCESS",
             "resourceId": "54101773-9a20-4e53-963c-353891ed8517"
         },
-        "tripId": "03e6cf79-3301-434b-b5e1-d6899b5639aa",
+        "orderId": "03e6cf79-3301-434b-b5e1-d6899b5639aa",
         "flightResponse": {
             "type": "SUCCESS",
             "resourceId": "523d33be-815c-44f7-b52b-2337b770872d"
@@ -159,14 +161,14 @@ Example:
 
 ```json
 {
-    "tripId" : "03e6cf79-3301-434b-b5e1-d6899b5639aa",
+    "orderId" : "03e6cf79-3301-434b-b5e1-d6899b5639aa",
     "failService" : "PaymentService"    
 }
 ```
 Curl command (using the JSON object above):
 
 ```sh
-curl -H "Content-Type: application/json" -X POST http://localhost:8080/trip -d '{"tripId" : "03e6cf79-3301-434b-b5e1-d6899b5639aa", "failService" : "PaymentService"}' 
+curl -H "Content-Type: application/json" -X POST http://localhost:8080/orders -d '{"orderId" : "03e6cf79-3301-434b-b5e1-d6899b5639aa", "failService" : "PaymentService"}' 
 ```
 
 Response example:
@@ -187,7 +189,7 @@ Response example:
         "type": "SUCCESS",
         "resourceId": "7ff1b4df-f999-4306-bc1d-e45cc7206695"
     },
-    "tripId": "03e6cf79-3301-434b-b5e1-d6899b5639aa",
+    "orderId": "03e6cf79-3301-434b-b5e1-d6899b5639aa",
     "flightResponse": {
         "type": "SUCCESS",
         "resourceId": "e2441697-f548-48be-aa1c-120e71bcd488"
